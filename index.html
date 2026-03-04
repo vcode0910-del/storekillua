@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PteroStore - Hosting Otomatis</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: white; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-grad { background: linear-gradient(to r, #3b82f6, #06b6d4); transition: 0.3s; }
+        .btn-grad:hover { opacity: 0.8; transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="p-6 flex justify-between items-center fixed w-full z-50 glass">
+        <h1 class="text-2xl font-bold tracking-tighter text-blue-400">PTERO<span class="text-white">STORE</span></h1>
+        <div class="space-x-8 hidden md:block">
+            <a href="#home" class="hover:text-blue-400">Home</a>
+            <a href="#pricing" class="hover:text-blue-400">Pricing</a>
+            <a href="#" class="btn-grad px-6 py-2 rounded-full font-bold">Client Area</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="h-screen flex flex-col justify-center items-center text-center px-4">
+        <h2 data-aos="fade-up" class="text-5xl md:text-7xl font-extrabold mb-6">
+            Server Gaming <span class="text-blue-500">Otomatis</span>
+        </h2>
+        <p data-aos="fade-up" data-aos-delay="200" class="text-gray-400 max-w-xl text-lg mb-8">
+            Order sekarang, bayar via QRIS, dan server Pterodactyl Anda langsung aktif dalam hitungan detik.
+        </p>
+        <div data-aos="fade-up" data-aos-delay="400">
+            <a href="#pricing" class="btn-grad px-10 py-4 rounded-xl text-xl font-bold shadow-lg shadow-blue-500/20">Mulai Sekarang</a>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 px-6 max-w-6xl mx-auto">
+        <h3 class="text-3xl font-bold text-center mb-12">Pilih Paket Anda</h3>
+        <div class="grid md:grid-cols-3 gap-8">
+            
+            <!-- Card 1 -->
+            <div data-aos="zoom-in" class="glass p-8 rounded-3xl hover:border-blue-500 transition cursor-pointer">
+                <h4 class="text-xl font-bold mb-2">Hemat</h4>
+                <div class="text-4xl font-extrabold mb-6">Rp 15.000<span class="text-sm font-light text-gray-400">/bln</span></div>
+                <ul class="space-y-4 mb-8 text-gray-300">
+                    <li>🚀 CPU 100% (Shared)</li>
+                    <li>💾 RAM 1 GB</li>
+                    <li>📁 Disk 5 GB NVMe</li>
+                    <li>⚡ Instant Aktif</li>
+                </ul>
+                <button onclick="order(1, 'Hemat', 15000)" class="w-full py-3 rounded-xl border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition font-bold">Beli Sekarang</button>
+            </div>
+
+            <!-- Card 2 (Popular) -->
+            <div data-aos="zoom-in" data-aos-delay="200" class="glass p-8 rounded-3xl border-2 border-blue-500 relative transform scale-105 shadow-2xl shadow-blue-500/10">
+                <span class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-500 text-xs px-4 py-1 rounded-full uppercase font-bold text-white">Terlaris</span>
+                <h4 class="text-xl font-bold mb-2">Sultan</h4>
+                <div class="text-4xl font-extrabold mb-6">Rp 50.000<span class="text-sm font-light text-gray-400">/bln</span></div>
+                <ul class="space-y-4 mb-8 text-gray-300">
+                    <li>🚀 CPU 200%</li>
+                    <li>💾 RAM 4 GB</li>
+                    <li>📁 Disk 20 GB NVMe</li>
+                    <li>⚡ Instant Aktif</li>
+                </ul>
+                <button onclick="order(2, 'Sultan', 50000)" class="w-full py-3 rounded-xl btn-grad text-white transition font-bold">Beli Sekarang</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Midtrans Snap (Untuk Pembayaran) -->
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="YOUR_CLIENT_KEY"></script>
+
+    <script>
+        AOS.init({ duration: 1000, once: true });
+
+        async function order(planId, planName, price) {
+            const { value: email } = await Swal.fire({
+                title: 'Konfirmasi Order',
+                text: `Paket: ${planName} - Rp ${price}`,
+                input: 'email',
+                inputLabel: 'Masukkan Email Anda (Untuk Akun Panel)',
+                inputPlaceholder: 'email@gmail.com',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6'
+            });
+
+            if (email) {
+                Swal.fire('Proses...', 'Sedang mengalihkan ke pembayaran', 'info');
+                
+                // 1. Panggil file PHP untuk ambil Token Midtrans
+                // Ganti dengan endpoint PHP Anda
+                fetch('api/pay.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: email, planId: planId, price: price })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    snap.pay(data.token, {
+                        onSuccess: function(result){ 
+                            // 2. Jika sukses bayar, panggil fungsi buat server
+                            createServer(email, planId);
+                        }
+                    });
+                });
+            }
+        }
+
+        function createServer(email, planId) {
+            fetch('api/create_server.php', {
+                method: 'POST',
+                body: JSON.stringify({ email: email, planId: planId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    Swal.fire('Berhasil!', 'Server aktif! Cek email Anda untuk login panel.', 'success');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
